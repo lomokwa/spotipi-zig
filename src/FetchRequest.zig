@@ -30,6 +30,18 @@ pub const FetchRequest = struct {
 	}
 
 	//TODO: get request
+	pub fn get(self: *Self, url: []const u8) !Client.FetchResult {
+		const fetch_options = Client.FetchOptions{
+			.location = Client.FetchOptions.Location {
+				.url = url,
+			},
+			.method = .GET,
+			.response_storage = .{ .dynamic = &self.body }
+		};
+
+		const res = try self.client.fetch(fetch_options);
+		return res;
+	}
 
 	pub fn post(self: *Self, url: []const u8, body: []const u8, headers: []http.Header) !Client.FetchResult {
 		const fetch_options = Client.FetchOptions{
