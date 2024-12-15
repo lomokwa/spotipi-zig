@@ -5,7 +5,13 @@ const utils = @import("utils.zig");
 const http = std.http;
 const heap = std.heap;
 
-pub fn getAccessToken() !void {
+pub const AccessToken = struct {
+    access_token: []const u8,
+    token_type: []const u8,
+    expires_in: u16,
+};
+
+pub fn getAccessToken(allocator: std.mem.Allocator) !AccessToken {
     var gpa_impl = heap.GeneralPurposeAllocator(.{}){};
     defer if (gpa_impl.deinit() == .leak) {
         std.log.warn("Memory leak\n", .{});
@@ -32,4 +38,25 @@ pub fn getAccessToken() !void {
     }
 
     std.debug.print("POST res body - {s}\n", .{body});
+
+    const parsed = try std.json.parseFromSlice(AccessToken, gpa, body, .{});
+    defer parsed.deinit();
+
+    std.debug.print("expires in: {d}\nType: {}\n", .{parsed.value.expires_in, @TypeOf(parsed.value.expires_in)});
+
+    const access_token = try allocator.dupe(u8, parsed.value.access_token);
+    const token_type = try allocator.dupe(u8, parsed.value.token_type);
+    const expires_in = parsed.value.expires_in;
+
+    const data = AccessToken{
+        .access_token = access_token, 
+        .token_type = token_type,
+        .expires_in = expires_in
+    };
+
+    return data;
+}
+
+pub fn refreshAccessToken() !void {
+    
 }
