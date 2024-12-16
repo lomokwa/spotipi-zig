@@ -42,8 +42,6 @@ pub fn getAccessToken(allocator: std.mem.Allocator) !AccessToken {
     const parsed = try std.json.parseFromSlice(AccessToken, gpa, body, .{});
     defer parsed.deinit();
 
-    std.debug.print("expires in: {d}\nType: {}\n", .{parsed.value.expires_in, @TypeOf(parsed.value.expires_in)});
-
     const access_token = try allocator.dupe(u8, parsed.value.access_token);
     const token_type = try allocator.dupe(u8, parsed.value.token_type);
     const expires_in = parsed.value.expires_in;
