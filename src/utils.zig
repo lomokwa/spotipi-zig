@@ -31,3 +31,14 @@ pub fn loadSecrets() !Secrets {
   
   return secrets.?;
 }
+
+fn isNumericString(input: []const u8) bool {
+  for (input) |char| {
+    if (char < '0' or char > '9') {
+      return false;
+    }
+  }
+  return true;
+}
+
+
