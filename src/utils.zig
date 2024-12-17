@@ -32,6 +32,23 @@ pub fn loadSecrets() !Secrets {
   return secrets.?;
 }
 
+pub fn generateRandomString(charCount: u16) ![]const u8 {
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  var random = std.rand.DefaultPrng.init(std.time.nanoTimestamp());
+
+  const allocator = std.heap.page_allocator;
+  const buffer = try allocator.alloc(u8, charCount);
+  defer allocator.free(buffer);
+
+  for (buffer) |*char| {
+    const index = random.random.usize() % charset.len;
+    char.* = charset[index];
+  }
+
+  return buffer;
+}
+
 fn isNumericString(input: []const u8) bool {
   for (input) |char| {
     if (char < '0' or char > '9') {
