@@ -5,25 +5,25 @@ const utils = @import("utils.zig");
 const http = std.http;
 const heap = std.heap;
 
-const secrets =  utils.loadSecrets();
-
 pub const AccessToken = struct {
     access_token: []const u8,
     token_type: []const u8,
-    scope: ?[]const u8,
+    // scope: ?[]const u8,
     expires_in: u16,
-    refresh_token: ?[]const u8
+    // refresh_token: ?[]const u8
 };
 
 pub fn getAccessToken(allocator: std.mem.Allocator) !AccessToken {
-    var gpa_impl = heap.GeneralPurposeAllocator(.{}){};
-    defer if (gpa_impl.deinit() == .leak) {
+    var gpa_alloc = heap.GeneralPurposeAllocator(.{}){};
+    defer if (gpa_alloc.deinit() == .leak) {
         std.log.warn("Memory leak\n", .{});
     };
-    const gpa = gpa_impl.allocator();
+    const gpa = gpa_alloc.allocator();
 
     var req = fetch.FetchRequest.init(gpa);
     defer req.deinit();
+
+    const secrets = try utils.loadSecrets();
 
     const url = "https://accounts.spotify.com/api/token";
     var headers = [_]http.Header{.{ .name = "content-type", .value = "application/x-www-form-urlencoded"}};
@@ -57,21 +57,19 @@ pub fn getAccessToken(allocator: std.mem.Allocator) !AccessToken {
     return data;
 }
 
-pub fn getUserAuth(allocator: std.mem.Allocator) !AccessToken {
-    var gpa_impl = heap.GeneralPurposeAllocator(.{}){};
-    defer if (gpa_impl.deinit() == .leak) {
-        std.log.warn("Memory leak\n", .{});
-    };
-    const gpa = gpa_impl.allocator();
+// pub fn getUserAuth(allocator: std.mem.Allocator) !AccessToken {
+//     var gpa_alloc = heap.GeneralPurposeAllocator(.{}){};
+//     defer if (gpa_alloc.deinit() == .leak) {
+//         std.log.warn("Memory leak\n", .{});
+//     };
+//     const gpa = gpa_alloc.allocator();
 
-    var req = fetch.FetchRequest.init(gpa);
-    defer req.deinit();
+//     var req = fetch.FetchRequest.init(gpa);
+//     defer req.deinit();
 
-    var state = try utils.generateRandomString(16);
-    const scope = "user-read-currently-playing";
-
-    const url = 
-}
+//     var state = try utils.generateRandomString(16);
+//     const scope = "user-read-currently-playing";
+// }
 
 pub fn refreshAccessToken() !void {
     

@@ -9,7 +9,7 @@ pub const EncodingMode = enum {
 
 pub fn getEncodingMode(link: []const u8) u4 {
   if (isNumeric) {
-    return 0b0001;
+    return EncodingMode.numeric;
   }
 
   if (isAlphanumeric) {
