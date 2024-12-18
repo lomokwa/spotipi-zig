@@ -1,7 +1,7 @@
 # THE PLAN
 - [x] Post request working
 - [x] Make sure spotify api is returning data
-- [ ] Set up basic webserver to track oauth
+- [ ] Set up basic webserver to track oauth / set up basic nodejs server to track oauth and return data to zig
 - [ ] Make sure user oauth function works
 - [ ] Set up token refresh after user logs in
 - [ ] Set up function to fetch current song data
