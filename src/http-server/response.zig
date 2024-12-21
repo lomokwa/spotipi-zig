@@ -11,7 +11,7 @@ pub fn send_200(connection: Connection) !void {
   _ = try connection.stream.write(message);
 }
 
-pub fn send_400(connection: Connection) !void {
+pub fn send_404(connection: Connection) !void {
   const message = (
     "HTTP/1.1 404 Not Found\nContent-Length:48" ++
     "\nContent-Type: text/html\n" ++

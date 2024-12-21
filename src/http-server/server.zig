@@ -1,6 +1,8 @@
 const std = @import("std");
 const SocketConf = @import("config.zig");
 const Request = @import("request.zig");
+const Response = @import("response.zig");
+const Method = Request.HttpMethod;
 const net = std.net;
 const mem = std.mem;
 const stdout = std.io.getStdOut().writer();
@@ -23,6 +25,14 @@ pub fn startServer() !void {
   }
   try Request.read_request(connection, buffer[0..buffer.len]);
   const request = Request.parse_request(buffer[0..buffer.len]);
+
+  if (request.method == Method.GET) {
+    if (mem.eql(u8, request.uri, "/")) {
+      try Response.send_200(connection);
+    } else {
+      try Response.send_404(connection);
+    }
+  }
 
   try stdout.print("{any}\n", .{request});
 }
