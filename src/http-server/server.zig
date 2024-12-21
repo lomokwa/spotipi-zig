@@ -16,11 +16,13 @@ pub fn startServer() !void {
   std.log.info("Server running on: {}\n", .{socket._address});
   var server = try socket._address.listen(.{});
   const connection = try server.accept();
+  
   var buffer: [1000]u8 = undefined;
   for (0..buffer.len) |i| {
     buffer[i] = 0;
   }
+  try Request.read_request(connection, buffer[0..buffer.len]);
+  const request = Request.parse_request(buffer[0..buffer.len]);
 
-  _ = try Request.read_request(connection, &buffer);
-  try stdout.print("{s}\n", .{buffer});
+  try stdout.print("{any}\n", .{request});
 }
