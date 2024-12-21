@@ -1,6 +1,6 @@
 const std = @import("std");
 const spotify = @import("spotify.zig");
-const server = @import("server.zig");
+const server = @import("http-server/server.zig");
 
 pub fn main() !void {
     // var gpa_alloc = std.heap.GeneralPurposeAllocator(.{}){};
@@ -15,5 +15,5 @@ pub fn main() !void {
 
     // std.debug.print("========================================================\nSPOTIFY DATA:\n\naccess_token = {s},\ntoken_type = {s},\nexpires_in = {d}\n", .{res.access_token, res.token_type, res.expires_in});
 
-    try server.startServer(8080);
+    try server.startServer();
 }

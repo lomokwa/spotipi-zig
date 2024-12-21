@@ -1,7 +1,7 @@
 const std = @import("std");
 const net = std.net;
 
-const Socket = struct {
+pub const Socket = struct {
   _address: std.net.Address,
   _stream: std.net.Stream,
 
