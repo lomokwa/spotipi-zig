@@ -6,6 +6,7 @@ const Method = Request.HttpMethod;
 const net = std.net;
 const mem = std.mem;
 const stdout = std.io.getStdOut().writer();
+const os = std.os;
 
 pub fn startServer() !void {
   // var gpa_alloc = std.heap.GeneralPurposeAllocator(.{}){};
@@ -13,26 +14,33 @@ pub fn startServer() !void {
   //   std.log.warn("Memory leak\n", .{});
   // };
   // const gpa = gpa_alloc.allocator();
-
   const socket = try SocketConf.Socket.init();
   std.log.info("Server running on: {}\n", .{socket._address});
   var server = try socket._address.listen(.{});
-  const connection = try server.accept();
-  
-  var buffer: [1000]u8 = undefined;
-  for (0..buffer.len) |i| {
-    buffer[i] = 0;
-  }
-  try Request.read_request(connection, buffer[0..buffer.len]);
-  const request = Request.parse_request(buffer[0..buffer.len]);
 
-  if (request.method == Method.GET) {
-    if (mem.eql(u8, request.uri, "/")) {
-      try Response.send_200(connection);
-    } else {
-      try Response.send_404(connection);
+  while (true) {
+    const connection = try server.accept();
+    
+    var buffer: [1000]u8 = undefined;
+    for (0..buffer.len) |i| {
+      buffer[i] = 0;
     }
+    try Request.read_request(connection, buffer[0..buffer.len]);
+    const request = Request.parse_request(buffer[0..buffer.len]);
+
+    if (request.method == Method.GET) {
+      if (mem.eql(u8, request.uri, "/")) {
+        try Response.send_200(connection);
+      } else {
+        try Response.send_404(connection);
+      }
+    }
+
+    try stdout.print("{s}\n", .{buffer});
+    connection.stream.close();
   }
 
-  try stdout.print("{any}\n", .{request});
+  std.log.info("Shutting down server...", .{});
+  server.deinit();
+  socket._stream.close();
 }

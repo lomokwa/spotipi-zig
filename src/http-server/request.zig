@@ -39,9 +39,9 @@ pub fn parse_request(text: []u8) Request {
   const line_index = std.mem.indexOfScalar(u8, text, '\n') orelse text.len;
   var iterator = std.mem.splitScalar(u8, text[0..line_index], ' ');
 
-  const method = try HttpMethod.init(iterator.next().?);
-  const uri = iterator.next().?;
-  const version = iterator.next().?;
+  const method = try HttpMethod.init(iterator.next() orelse "");
+  const uri = iterator.next() orelse "";
+  const version = iterator.next() orelse "";
   const request = Request.init(method, uri, version);
   return request;
 }
