@@ -57,19 +57,27 @@ pub fn getAccessToken(allocator: std.mem.Allocator) !AccessToken {
     return data;
 }
 
-// pub fn getUserAuth(allocator: std.mem.Allocator) !AccessToken {
-//     var gpa_alloc = heap.GeneralPurposeAllocator(.{}){};
-//     defer if (gpa_alloc.deinit() == .leak) {
-//         std.log.warn("Memory leak\n", .{});
-//     };
-//     const gpa = gpa_alloc.allocator();
+pub fn getUserAuth() !void {
+    var gpa_alloc = heap.GeneralPurposeAllocator(.{}){};
+    defer if (gpa_alloc.deinit() == .leak) {
+        std.log.warn("Memory leak\n", .{});
+    };
+    const gpa = gpa_alloc.allocator();
 
-//     var req = fetch.FetchRequest.init(gpa);
-//     defer req.deinit();
+    var req = fetch.FetchRequest.init(gpa);
+    defer req.deinit();
 
-//     var state = try utils.generateRandomString(16);
-//     const scope = "user-read-currently-playing";
-// }
+    const secrets = try utils.loadSecrets();
+
+    const state = try utils.generateRandomString(16);
+    const scope = "user-read-currently-playing";
+    const redirect_uri = "http://localhost:8080/spotify-auth";
+
+    const url = try std.fmt.allocPrint(gpa, "https://accounts.spotify.com/authorize?response_type=code&client_id={s}&scope={s}&redirect_uri={s}&state={s}", .{secrets.client_id, scope, redirect_uri, state});  
+    defer gpa.free(url);
+
+    std.debug.print("Click here to auth spotify: {s}\n", .{url});
+}
 
 pub fn refreshAccessToken() !void {
     
